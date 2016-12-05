@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "draw.h"
+#include "memdraw.h"
 #include "ff.h"
 
 int main(int argc, char **argv) {
