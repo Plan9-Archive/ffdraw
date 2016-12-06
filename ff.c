@@ -24,6 +24,7 @@ FFStuff stuff;
 void
 initff(char *file){
 	int i;
+	AVCodecContext *vcodec = NULL;
 
 	av_register_all();
 
@@ -40,6 +41,7 @@ initff(char *file){
 	for(i=0; i<stuff.formatctx->nb_streams; i++){
 		if(stuff.formatctx->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO) {
 			stuff.videoidx = i;
+			vcodec = &stuff.formatctx->streams[stuff.videoidx]->codec;
 			break;
 		}
 	}
@@ -59,14 +61,33 @@ initff(char *file){
 		fprintf(stderr, "didn't find an audio stream\n");
 		exit(-3);
 	}
-
-	
 }
 
 void
 ffdraw(void){
 	AVPacket pkt1, *pkt = &pkt1;
+	int len1, got_picture;
+	AVFrame *frame = avcodec_alloc_frame();
+	AVCodecContext *vcodec = &stuff.formatctx->streams[stuff.videoidx]->codec;
 
 	while(av_read_frame(stuff.formatctx, pkt) >= 0){
+		if(pkt->stream_index != stuff.videoidx){
+			av_free_packet(pkt);
+			continue;
+		}
+
+	//	if(vcodec->codec_id == CODEC_ID_RAWVIDEO){
+			avpicture_fill((AVPicture *)frame, pkt->data, vcodec->pix_fmt,
+							vcodec->width, vcodec->height);
+            frame->pict_type = FF_I_TYPE;
+/*		}else{
+			len1 = avcodec_decode_video(vcodec, frame, &got_picture,
+										pkt->data, pkt->size);
+			if(got_picture){
+			}
+		}*/
+		av_free_packet(pkt);
 	}
+
+	av_free(frame);
 }

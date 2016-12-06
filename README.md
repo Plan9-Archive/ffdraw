@@ -1,6 +1,6 @@
 # ffdraw #
 
-ffdraw is a program for linuxemu3 on plan9front.
+ffdraw is a video player for linuxemu3 on plan9front.
 
 ### How do I get set up? ###
 
